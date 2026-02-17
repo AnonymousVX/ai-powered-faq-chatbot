@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI FAQ Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <h2>AI FAQ Chatbot</h2>
+
+        <div id="chat-box">
+            {% for user, bot, time in history %}
+                <div class="user-msg"><b>You:</b> {{ user }}</div>
+                <div class="bot-msg"><b>Bot:</b> {{ bot }}</div>
+            {% endfor %}
+        </div>
+
+        <input type="text" id="message" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+<script>
+async function sendMessage() {
+    const messageInput = document.getElementById("message");
+    const message = messageInput.value;
+
+    if (!message) return;
+
+    const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message})
+    });
+
+    const data = await response.json();
+
+    if (data.response) {
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML += `<div class="user-msg"><b>You:</b> ${message}</div>`;
+        chatBox.innerHTML += `<div class="bot-msg"><b>Bot:</b> ${data.response}</div>`;
+        messageInput.value = "";
+    }
+}
+</script>
+</body>
+</html>
